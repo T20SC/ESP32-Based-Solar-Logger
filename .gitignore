@@ -1,0 +1,37 @@
+# PlatformIO
+.pio/
+.pioenvs/
+.piolibdeps/
+.clang_complete
+.gcc-flags.json
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Arduino IDE 
+*.hex
+*.bin
+*.elf
+*.map
+build/
+build-*/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Compiled binaries 
+*.o
+*.a
+*.so
+
+# Logs 
+*.log
+octave_crash.log
+
+# Local environment 
+.env
+secrets.h
+*_secrets.h
