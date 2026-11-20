@@ -17,6 +17,8 @@ struct Packet {
 
 Packet pkt; 
 
+uint32_t totalRetries = 0;
+
 unsigned long rttMin = 0xFFFFFFFF;
 unsigned long rttMax = 0;
 unsigned long long rttSum = 0;
@@ -64,6 +66,7 @@ void loop() {
     packetsSent++;
 
     uint8_t retryCount = radio.getARC(); // auto retry count  
+    totalRetries += retryCount;  
 
     if (sent) {
         ackSuccess++;  
@@ -79,8 +82,9 @@ void loop() {
         rttSum += rtt; 
         rttCount++;
 
-    }
+    } 
 
+    
     Serial.print("Sent seq=");
     Serial.print(pkt.seq); //Prints the seq number
 
@@ -102,7 +106,11 @@ void loop() {
     // --- periodic summary every 20 packets ---
   if (seq_count % 20 == 0) {
     float ackRate = ((float)(100.0 * ackSuccess) / packetsSent);
-    float rttAvg = (float)rttSum / rttCount : 0;
+    float rttAvg = (rttCount > 0) ? (float)rttSum / rttCount : 0;
+
+    uint32_t totalAttempts = packetsSent + totalRetries;
+    uint32_t failedAttempts = (packetsSent - ackSuccess) + totalRetries;
+    float PER = (totalAttempts > 0) ? (100.0 * failedAttempts / totalAttempts) : 0;
 
     Serial.println("--- TX SUMMARY ---");
     Serial.print("Created=");
@@ -121,7 +129,11 @@ void loop() {
     Serial.print(rttMax);
     Serial.print(" RTT(us) avg=");
     Serial.println(rttAvg);
-    Serial.println("------------------");
+    Serial.println("------------------"); 
+
+    Serial.print("PER=");
+    Serial.print(PER);
+    Serial.println("%");
   }
 
     seq_count++;
